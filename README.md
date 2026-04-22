@@ -8,6 +8,9 @@
     * [Non-Devs](#non-devs)
     * [Usage Diagram](#usage-diagram)
 * [Contributing](#contributing)
+    * [Issues](#issues)
+    * [Branching](#branching)
+    * [Pull Requests](#pull-requests)
 
 ## About
 
@@ -84,4 +87,33 @@ You can download and view `pace.svg` if you cannot zoom in through here.
 
 ## Contributing
 
-GitBack is currently closed to contributions from anyone but the author. Check back later, as this will change soon.
+### Issues
+
+There should be at least one issue associated with *all* contributions of *any* kind. **Bug reports** must be given the `bug` label. **Feature requests** or **improvements** must be given the `enhancement` label. **Documentation requests** should be given the `documentation` label. **All issues must have at least one label**. If you plan to address an issue, you **should assign it to yourself**.
+
+User proper maintainer etiquette. Sufficient name, description, environment details, and a minimal-steps-to-reproduce whenever possible.
+
+### Branching
+
+The `main` branch is protected. We use [trunk-based-development](https://trunkbaseddevelopment.com/). All work must be done in ephemeral branches spawned from the `main` branch. Branches must correspond to an issue. They should be named according to the following format:
+
+```
+<prefix>/<issue micro summary>-<issue #>
+```
+
+Choose from one of the following prefixes:
+
+- `feature/` for new features. Things with the `enhancement` tag.
+- `hotfix/` for bugs, security, UI adjustments, grammar correction, etc. This does not include documentation (see `doc/`).
+- `doc/` for changes/additions to documentation. These do NOT Increment version number!
+
+### Pull Requests
+
+Pull requests will have to be reviewed by me before they can be merged, so listen up.
+
+1. YOUR CONTRIBUTION MUST ADDRESS AN ISSUE.
+2. Test your code. I'm not debugging it for you unless you ask for help.
+3. Follow the code style.
+4. Squash as many commits as appropriate. If you have 4 commits trying to fix a bug, squash them.
+5. Proper brief title, well-formatted description (major changes, minor changes, etc.)
+6. Rebase > merge **whenever possible**.
