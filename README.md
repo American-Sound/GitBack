@@ -1,0 +1,87 @@
+# GitBack
+
+* [About](#about)
+* [Dependencies](#dependencies)
+* [Usage](#usage)
+    * [Install](#install)
+    * [Devs](#devs)
+    * [Non-Devs](#non-devs)
+    * [Usage Diagram](#usage-diagram)
+* [Contributing](#contributing)
+
+## About
+
+**This repo is a work in progress but has a functioning app, installer scripts, and an automation script for ADO. Automation for other Git platforms and documentation coming soon.**
+
+[Git](https://git-scm.com/) is a fantastic version control system for developers. However, sometimes non-developers work closely with developers in a way that would still make Git useful. These people should not be required to learn such a tool - which can easily break if not thoroughly understood - when they only need to use an extremely small subset of its features. **GitBack** is intended to close that gap by automating a small subset of Git commands in a way that would be familiar with non-software engineers. It provides:
+
+* The GitBack app
+    * "Checkout" and "Publish" functionality that automate cloning, pulling, pushing, and branching.
+    * Extensive logging of user actions, user error, and Git errors - intended to be readable to devs in case something needs fixed.
+    * Links to documentation at every step in case non-devs need a streamlined refresher on how the app works.
+* Automation scripts for popular Git hosting platforms
+    * Scripts for automatically opening PRs for work published from the GitBack app. Your devs know Git and own the repos, they make sure everything comes together cleanly and save your field engineers time and energy.
+    * Implemented for Azure DevOps. Planned support for GitHub, GitLab, and Bitbucket.
+
+## Dependencies
+
+[Git](https://git-scm.com/) is obviously a dependency. If you provision GitBack, you will want to provision git as well. On Windows, you will want [git for Windows](https://gitforwindows.org/) On Linux or Mac, I would hope you know what you're doing.
+
+**If you opt to not use the installer script:** the app is written in Python, so there are a handful of dependencies located in a `requirements.txt` for your convenience.
+
+1. Create and activate the Python virtual environment
+
+```sh
+python -m venv .venv
+
+# bash (usually the case for Linux or Git Bash)
+source .venv/bin/activate
+
+# Windows CMD
+.venv\Scripts\activate.bat
+
+# Powershell
+.venv\Scripts\activate.ps1
+```
+
+2. Install the dependencies to the virtual environment
+
+```sh
+pip install -r requirements.txt
+```
+
+## Usage
+
+### Install
+
+Soon, releases will include the installer found at `install/gitback.iss`. For now, you can generate the installer with that script yourself (**not recommended unless you are provisioning**) or run the appropriate install script found in the `install/` directory. There is one for powershell, bash (linux), and Git for Windows.
+
+### Devs
+
+1. Devs should inform their field engineer or support engineer counterparts to make sure they have GitBack installed on their devices. It is recommended to do so either through company-wide provisioning or directly from this repository's **releases**.
+
+2. If automatic PRs are not setup using the automation scripts, devs should manually create PRs from any commission branches that are created by non-devs.
+
+3. Before merging a PR, the dev should ensure that there are no breaking changes with a thorough review of all changes within the PR.
+
+4. If a non-dev reports issues to the dev, the devs should look for **logs** on the user's machine. On **Windows**, these will be located at `C:\Users\USER\AppData\Local\GitBack\GitBack\logs\`. On **Linux**, this will be in `~/.local/share/GitBack/logs/`
+
+### Non-Devs
+
+1. Install and/or launch GitBack
+
+2. **Checkout** a project. You can do this with a **URL** to a remote repository and a path to an **empty** destination directory, or **no URL** and just a path to a **local Git repository**.
+
+3. Make your changes to the code.
+
+4. When all changes are done, **publish** them. Go to the publish page, browse to your **local copy of the repository** as checked out before, **write a message describing what you changed**, and then **publish** your changes. <ins>**YOU MUST CHECKOUT THE PROJECT AGAIN BEFORE MAKING MORE CHANGES.**</ins>
+
+### Usage Diagram
+
+You can download and view `pace.svg` if you cannot zoom in through here.
+
+![](pace.svg)
+
+## Contributing
+
+GitBack is currently closed to contributions from anyone but the author. Check back later, as this will change soon.

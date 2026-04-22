@@ -1,0 +1,59 @@
+trigger:
+  branches:
+    include:
+      - commission-branch-*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - script: |
+      echo "Branch: $(Build.SourceBranchName)"
+      if echo "$(Build.SourceBranchName)" | grep -qE '^commission-branch-[0-9]+$'; then
+        echo "##vso[task.setvariable variable=isCommissionBranch]true"
+        echo "Valid commission branch detected."
+        AUTHOR=$(git log -1 --pretty=format:'%an')
+        TIMESTAMP=$(git log -1 --pretty=format:'%ai')
+        echo "Author: $AUTHOR"
+        echo "Timestamp: $TIMESTAMP"
+        echo "##vso[task.setvariable variable=commitAuthor]$AUTHOR"
+        echo "##vso[task.setvariable variable=commitTimestamp]$TIMESTAMP"
+      else
+        echo "##vso[task.setvariable variable=isCommissionBranch]false"
+        echo "Branch does not match commission-branch-<number> pattern. Skipping."
+      fi
+    displayName: 'Validate branch name'
+
+  - script: |
+      EXISTING=$(az repos pr list \
+        --repository "$BUILD_REPO" \
+        --source-branch "$SOURCE_BRANCH" \
+        --target-branch main \
+        --status active \
+        --query "[].pullRequestId" -o tsv)
+      if [ -n "$EXISTING" ]; then
+        echo "PR already exists (ID: $EXISTING). Skipping creation."
+        exit 0
+      fi
+      az devops configure --defaults organization="$SYSTEM_URI" project="$SYSTEM_PROJECT"
+      DESCRIPTION="Auto-generated PR for commission branch ${BRANCH_NAME}."
+      DESCRIPTION="${DESCRIPTION}\n\nLast commit author: ${COMMIT_AUTHOR}"
+      DESCRIPTION="${DESCRIPTION}\nLast commit timestamp: ${COMMIT_TIMESTAMP}"
+      az repos pr create \
+        --repository "$BUILD_REPO" \
+        --source-branch "$SOURCE_BRANCH" \
+        --target-branch main \
+        --title "PR: ${BRANCH_NAME} to main" \
+        --description "$(printf "$DESCRIPTION")" \
+        --auto-complete false
+    displayName: 'Create PR to main'
+    condition: eq(variables.isCommissionBranch, 'true')
+    env:
+      AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+      BUILD_REPO: $(Build.Repository.Name)
+      SOURCE_BRANCH: $(Build.SourceBranch)
+      BRANCH_NAME: $(Build.SourceBranchName)
+      SYSTEM_URI: $(System.CollectionUri)
+      SYSTEM_PROJECT: $(System.TeamProject)
+      COMMIT_AUTHOR: $(commitAuthor)
+      COMMIT_TIMESTAMP: $(commitTimestamp)
