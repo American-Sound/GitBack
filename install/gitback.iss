@@ -4,6 +4,7 @@ AppVersion={#AppVersion}
 AppPublisher=American Sound & Engineering Inc.
 DefaultDirName={autopf}\GitBack
 DefaultGroupName=GitBack
+OutputBaseFilename=GitBack_Setup_{#AppVersion}
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=admin

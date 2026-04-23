@@ -1,0 +1,152 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+
+  build-windows-installer:
+    name: Windows Installer (64-bit)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build with PowerShell
+        shell: pwsh
+        run: ./install/install.ps1
+
+      - name: Extract version from tag
+        id: version
+        shell: pwsh
+        run: echo "VERSION=$('${{ github.ref_name }}' -replace '^v','')" >> $env:GITHUB_OUTPUT
+
+      - name: Build installer with Inno Setup
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            /DAppVersion=${{ steps.version.outputs.VERSION }} `
+            /DSourceDir="${{ github.workspace }}\dist\GitBack" `
+            install/gitback.iss
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: install\Output\*.exe
+
+
+  build-windows-binary:
+    name: Windows Binary (portable)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build with PowerShell
+        shell: pwsh
+        run: ./install/install.ps1
+
+      - name: Zip portable binary
+        shell: pwsh
+        run: Compress-Archive -Path dist\GitBack\* -DestinationPath GitBack-windows-x64.zip
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-binary
+          path: GitBack-windows-x64.zip
+
+
+  build-linux-binary:
+    name: Linux Binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build
+        run: |
+          chmod +x ./install/install.sh
+          ./install/install.sh
+
+      - name: Tar binary
+        run: tar -czf GitBack-linux-x64.tar.gz -C dist/GitBack .
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-binary
+          path: GitBack-linux-x64.tar.gz
+
+
+  release:
+    name: Create Release
+    needs: [build-windows-installer, build-windows-binary, build-linux-binary]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # needed for changelog generation
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Determine if major release
+        id: release_type
+        run: |
+          VERSION="${{ github.ref_name }}"          # e.g. v2.0.0
+          MAJOR=$(echo "$VERSION" | cut -d. -f1 | tr -d 'v')
+          # compare against the previous tag's major version
+          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '2p')
+          if [ -n "$PREV_TAG" ]; then
+            PREV_MAJOR=$(echo "$PREV_TAG" | cut -d. -f1 | tr -d 'v')
+            if [ "$MAJOR" -gt "$PREV_MAJOR" ]; then
+              echo "IS_MAJOR=true" >> $GITHUB_OUTPUT
+            else
+              echo "IS_MAJOR=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "IS_MAJOR=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '2p')
+          if [ -n "$PREV_TAG" ]; then
+            LOG=$(git log "$PREV_TAG".."${{ github.ref_name }}" --pretty=format:"- %s" --no-merges)
+          else
+            LOG=$(git log --pretty=format:"- %s" --no-merges)
+          fi
+          # Write to a file to safely handle multiline content
+          echo "$LOG" > changelog.txt
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}${{ steps.release_type.outputs.IS_MAJOR == 'true' && ' (Major Release)' || '' }}
+          body_path: changelog.txt
+          prerelease: false
+          files: |
+            artifacts/windows-installer/GitBack_Setup_*.exe
+            artifacts/windows-binary/GitBack-windows-x64.zip
+            artifacts/linux-binary/GitBack-linux-x64.tar.gz
