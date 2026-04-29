@@ -16,19 +16,19 @@
 
 **This repo is a work in progress but has a functioning app, installer scripts, and an automation script for ADO. Automation for other Git platforms and documentation coming soon.**
 
-[Git](https://git-scm.com/) is a fantastic version control system for developers. However, sometimes non-developers work closely with developers in a way that would still make Git useful. These people should not be required to learn such a tool - which can easily break if not thoroughly understood - when they only need to use an extremely small subset of its features. **GitBack** is intended to close that gap by automating a small subset of Git commands in a way that would be familiar with non-software engineers. It provides:
+[Git](https://git-scm.com/) is a fantastic version control system for developers. However, sometimes non-developers need to work closely with developers in a way that could still make Git useful. These people should not be required to learn a tool - which can easily break if not thoroughly understood - when they only need to use an extremely small subset of its features. **GitBack** is intended to close that gap by automating a small subset of Git commands in a way that can be digestible to non-software engineers. It provides:
 
 * The GitBack app
     * "Checkout" and "Publish" functionality that automate cloning, pulling, pushing, and branching.
     * Extensive logging of user actions, user error, and Git errors - intended to be readable to devs in case something needs fixed.
     * Links to documentation at every step in case non-devs need a streamlined refresher on how the app works.
 * Automation scripts for popular Git hosting platforms
-    * Scripts for automatically opening PRs for work published from the GitBack app. Your devs know Git and own the repos, they make sure everything comes together cleanly and save your field engineers time and energy.
+    * Scripts for automatically opening PRs for work published from the GitBack app. Your devs know Git and own the repos, they make sure everything comes together cleanly and save your non-devs time and energy.
     * Implemented for Azure DevOps. Planned support for GitHub, GitLab, and Bitbucket.
 
 ## Dependencies
 
-[Git](https://git-scm.com/) is obviously a dependency. If you provision GitBack, you will want to provision git as well. On Windows, you will want [git for Windows](https://gitforwindows.org/) On Linux or Mac, I would hope you know what you're doing.
+[Git](https://git-scm.com/) is obviously a dependency. If you provision GitBack, you will want to provision git as well. On Windows, you will want [git for Windows](https://gitforwindows.org/) On Linux or Mac, I pray that you know what you're doing.
 
 **If you opt to not use the installer script:** the app is written in Python, so there are a handful of dependencies located in a `requirements.txt` for your convenience.
 
@@ -57,11 +57,11 @@ pip install -r requirements.txt
 
 ### Install
 
-Soon, releases will include the installer found at `install/gitback.iss`. For now, you can generate the installer with that script yourself (**not recommended unless you are provisioning**) or run the appropriate install script found in the `install/` directory. There is one for powershell, bash (linux), and Git for Windows.
+Soon, releases will include the installer found at `install/gitback.iss`. For now, you can generate the installer with that script yourself (**not recommended unless you are provisioning**) or run the appropriate install script found in the `install/` directory. There is one for Powershell, Bash (Linux), and Git for Windows.
 
 ### Devs
 
-1. Devs should inform their field engineer or support engineer counterparts to make sure they have GitBack installed on their devices. It is recommended to do so either through company-wide provisioning or directly from this repository's **releases**.
+1. Devs should inform their non-dev counterparts that they need to have GitBack installed on their devices. It is recommended to do so either through company-wide provisioning or directly from this repository's **releases**.
 
 2. If automatic PRs are not setup using the automation scripts, devs should manually create PRs from any commission branches that are created by non-devs.
 
@@ -91,7 +91,7 @@ You can download and view `pace.svg` if you cannot zoom in through here.
 
 There should be at least one issue associated with *all* contributions of *any* kind. **Bug reports** must be given the `bug` label. **Feature requests** or **improvements** must be given the `enhancement` label. **Documentation requests** should be given the `documentation` label. **All issues must have at least one label**. If you plan to address an issue, you **should assign it to yourself**.
 
-User proper maintainer etiquette. Sufficient name, description, environment details, and a minimal-steps-to-reproduce whenever possible.
+Use proper maintainer etiquette. Sufficient name, description, environment details, and a minimal-steps-to-reproduce whenever possible.
 
 ### Branching
 
