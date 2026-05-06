@@ -3,6 +3,9 @@ from git import Git, GitCommandError
 import logging
 from pathlib import Path
 import threading
+import platform
+import shutil
+import os
 
 
 
@@ -21,6 +24,41 @@ def is_remote_repository(url):
 
 
 
+def _setup_git_environment(logger: logging.Logger) -> None:
+
+    logger. info('Setting up Git environment.')
+    if platform.system() != 'Windows':
+        logger.info('System is not windows, no setup needed for Git')
+        return
+    
+    git_exe = shutil.which('git')
+    if not git_exe:
+        logger.warning('git.exe not found on PATH; skipping environment setup.')
+        return
+ 
+    git_root = Path(git_exe).resolve().parent
+    if git_root.name in ('cmd', 'bin'):
+        git_root = git_root.parent
+    if git_root.name == 'mingw64':
+        git_root = git_root.parent
+ 
+    usr_bin   = git_root / 'usr' / 'bin'
+    mingw_bin = git_root / 'mingw64' / 'bin'
+ 
+    if not usr_bin.is_dir() or not mingw_bin.is_dir():
+        logger.warning(f'Git for Windows layout unexpected at {git_root}; skipping environment setup.')
+        return
+ 
+    current_path = os.environ.get('PATH', '')
+    new_path = f'{usr_bin};{mingw_bin};{current_path}'
+    os.environ['PATH'] = new_path
+ 
+    os.environ.setdefault('MSYSTEM', 'MINGW64')
+ 
+    logger.info(f'Configured git environment from install root: {git_root}')
+
+
+
 class GitManager:
 
 
@@ -28,6 +66,7 @@ class GitManager:
     def __init__(self, logger : logging.Logger):
         self.logger = logger
         self.config = git.GitConfigParser()
+        _setup_git_environment(logger)
         self.repo = None
         self.commission_number = 0
         self.lock = threading.Lock()
@@ -81,12 +120,12 @@ class GitManager:
 
 
     def add_changes(self):
-        self.repo.index.add(['*'])
+        self.repo.git.add(['*'])
     
 
 
     def commit_changes(self, message):
-        self.repo.index.commit(message)
+        self.repo.git.commit(m=message)
 
 
     
