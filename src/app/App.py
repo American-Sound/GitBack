@@ -3,6 +3,8 @@ from tkinter import ttk
 from .MainPage import MainPage
 from .CheckoutPage import CheckoutPage
 from .PublishPage import PublishPage
+from .UpdatePage import UpdatePage
+from core.Updater import *
 
 
 
@@ -20,12 +22,15 @@ class App(Tk):
 
         self.frames = {}
 
-        for F in (MainPage, CheckoutPage, PublishPage):
+        for F in (UpdatePage, MainPage, CheckoutPage, PublishPage):
             frame = F(container, self, git_manager, logger)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky='nsew')
         
-        self.show_frame(MainPage)
+        if self.frames[UpdatePage].updates_available:
+            self.show_frame(UpdatePage)
+        else:
+            self.show_frame(MainPage)
 
     def go_home(self):
         self.show_frame(MainPage)
