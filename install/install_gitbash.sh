@@ -1,6 +1,11 @@
 python -m venv .venv
 source .venv/Scripts/activate
 pip install -r requirements.txt
+
+VERSION=${APP_VERSION#v}
+VERSION=${APP_VERSION:-"0.0.0-dev"}
+echo "__version__ = '$VERSION'" > src/version.py
+
 pyinstaller \
     --onedir \
     --noconfirm \
