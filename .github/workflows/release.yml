@@ -18,14 +18,16 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Build with PowerShell
-        shell: pwsh
-        run: ./install/install.ps1
-
       - name: Extract version from tag
         id: version
         shell: pwsh
         run: echo "VERSION=$('${{ github.ref_name }}' -replace '^v','')" >> $env:GITHUB_OUTPUT
+
+      - name: Build with PowerShell
+        shell: pwsh
+        env:
+          APP_VERSION: ${{ steps.version.outputs.VERSION }}
+        run: ./install/install.ps1
 
       - name: Build installer with Inno Setup
         shell: pwsh
@@ -53,8 +55,15 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Extract version from tag
+        id: version
+        shell: pwsh
+        run: echo "VERSION=$('${{ github.ref_name }}' -replace '^v','')" >> $env:GITHUB_OUTPUT
+
       - name: Build with PowerShell
         shell: pwsh
+        env:
+          APP_VERSION: ${{ steps.version.outputs.VERSION }}
         run: ./install/install.ps1
 
       - name: Zip portable binary
@@ -80,6 +89,8 @@ jobs:
           python-version: '3.11'
 
       - name: Build
+        env:
+          APP_VERSION: ${{ github.ref_name }}
         run: |
           chmod +x ./install/install.sh
           ./install/install.sh
@@ -103,19 +114,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0          # needed for changelog generation
+          fetch-depth: 0
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
 
+      - name: Write version.json
+        run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          cat > version.json << EOF
+          {
+            "version": "$VERSION",
+            "windows_installer": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/GitBack_Setup_$VERSION.exe",
+            "windows_binary": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/GitBack-windows-x64.zip",
+            "linux_binary": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/GitBack-linux-x64.tar.gz"
+          }
+          EOF
+
       - name: Determine if major release
         id: release_type
         run: |
-          VERSION="${{ github.ref_name }}"          # e.g. v2.0.0
+          VERSION="${{ github.ref_name }}"
           MAJOR=$(echo "$VERSION" | cut -d. -f1 | tr -d 'v')
-          # compare against the previous tag's major version
           PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '2p')
           if [ -n "$PREV_TAG" ]; then
             PREV_MAJOR=$(echo "$PREV_TAG" | cut -d. -f1 | tr -d 'v')
@@ -137,7 +160,6 @@ jobs:
           else
             LOG=$(git log --pretty=format:"- %s" --no-merges)
           fi
-          # Write to a file to safely handle multiline content
           echo "$LOG" > changelog.txt
 
       - name: Create Release
@@ -150,3 +172,4 @@ jobs:
             artifacts/windows-installer/GitBack_Setup_*.exe
             artifacts/windows-binary/GitBack-windows-x64.zip
             artifacts/linux-binary/GitBack-linux-x64.tar.gz
+            version.json
