@@ -34,7 +34,7 @@ jobs:
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
             /DAppVersion=${{ steps.version.outputs.VERSION }} `
-            /DSourceDir="${{ github.workspace }}\dist\GitBack" `
+            /DSourceDir="${{ github.workspace }}\dist\" `
             install/gitback.iss
 
       - name: Upload installer artifact
@@ -68,7 +68,7 @@ jobs:
 
       - name: Zip portable binary
         shell: pwsh
-        run: Compress-Archive -Path dist\GitBack\* -DestinationPath GitBack-windows-x64.zip
+        run: Compress-Archive -Path dist\* -DestinationPath GitBack-windows-x64.zip
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
@@ -96,7 +96,7 @@ jobs:
           ./install/install.sh
 
       - name: Tar binary
-        run: tar -czf GitBack-linux-x64.tar.gz -C dist/GitBack .
+        run: tar -czf GitBack-linux-x64.tar.gz -C dist/ .
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
