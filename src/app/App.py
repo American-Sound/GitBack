@@ -27,7 +27,7 @@ class App(Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky='nsew')
         
-        if self.frames[UpdatePage].updates_available:
+        if self.frames[UpdatePage].updates_available():
             self.show_frame(UpdatePage)
         else:
             self.show_frame(MainPage)
