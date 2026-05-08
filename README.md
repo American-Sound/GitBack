@@ -1,5 +1,7 @@
 # GitBack
 
+![](./res/logo.png)
+
 * [About](#about)
 * [Dependencies](#dependencies)
 * [Usage](#usage)
