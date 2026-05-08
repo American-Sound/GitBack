@@ -31,7 +31,7 @@ class UpdatePage(IPage):
 
 
     def update(self):
-        self.logger.info('Attempting to update...')
+        self.logger.info(f'Attempting to update from {__version__} to {self.available_updates["version"]}...')
         try:
             url = get_download_url(self.available_updates)
             path = download_update(url)

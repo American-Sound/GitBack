@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from platformdirs import user_data_dir
 from .GitManager import GitManager
+from .Updater import __version__
 
 
 def setup_logging() -> logging.Logger:
@@ -17,6 +18,8 @@ def setup_logging() -> logging.Logger:
 
     logger.addHandler(handler)
     _log_handler = handler
+
+    logger.info(f'Logging setup up for GitBack version {__version__}')
 
     return logger, _log_handler
 
