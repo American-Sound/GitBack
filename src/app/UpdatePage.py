@@ -4,6 +4,7 @@ from .IPage import IPage
 from .MainPage import MainPage
 from core.GitManager import *
 from core.Updater import *
+from core.Updater import __version__
 import sys
 
 
