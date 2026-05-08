@@ -27,7 +27,7 @@ jobs:
         shell: pwsh
         env:
           APP_VERSION: ${{ steps.version.outputs.VERSION }}
-        run: ./install/install.ps1
+        run: ./install/build.ps1
 
       - name: Build installer with Inno Setup
         shell: pwsh
@@ -64,7 +64,7 @@ jobs:
         shell: pwsh
         env:
           APP_VERSION: ${{ steps.version.outputs.VERSION }}
-        run: ./install/install.ps1
+        run: ./install/build.ps1
 
       - name: Zip portable binary
         shell: pwsh
@@ -92,8 +92,8 @@ jobs:
         env:
           APP_VERSION: ${{ github.ref_name }}
         run: |
-          chmod +x ./install/install.sh
-          ./install/install.sh
+          chmod +x ./install/build.sh
+          ./install/build.sh
 
       - name: Tar binary
         run: tar -czf GitBack-linux-x64.tar.gz -C dist/ .
