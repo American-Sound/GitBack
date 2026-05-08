@@ -14,7 +14,7 @@ except ImportError:
 
 
 
-VERSION_URL = "https://github.com/ccgargantua/GitBack/releases/latest/download/version.json"
+VERSION_URL = "https://github.com/american-sound/GitBack/releases/latest/download/version.json"
 TIMEOUT = 5
 
 
