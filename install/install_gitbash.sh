@@ -11,7 +11,7 @@ pyinstaller \
     --noconfirm \
     --windowed \
     --name "GitBack" \
-    --add-data "res/logo.png:res" \
+    --add-data "res:res" \
     --paths "src" \
     --contents-directory "." \
     --collect-binaries "python311" \

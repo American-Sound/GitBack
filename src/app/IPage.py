@@ -3,6 +3,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 import threading
 import time
+from core.Resource import resource_path
 
 
 
@@ -38,7 +39,7 @@ class IPage(Frame):
             self.MAINFRAME_PADDING_Y))
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
 
-        logo_image = Image.open('res/logo.png').resize((self.LOGO_WIDTH, self.LOGO_HEIGHT))
+        logo_image = Image.open(resource_path('res/logo.png')).resize((self.LOGO_WIDTH, self.LOGO_HEIGHT))
         self.logo = ImageTk.PhotoImage(logo_image)
         self.logo_label = Label(self, image=self.logo)
         self.logo_label.image = self.logo
