@@ -91,6 +91,7 @@ class IPage(Frame):
             pass
 
 
+
     def pad(self):
         def _pad_all(widget):
             for child in widget.winfo_children():

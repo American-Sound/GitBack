@@ -1,5 +1,5 @@
 import git
-from git import Git, GitCommandError
+from git import Git, GitCommandError, GitConfigParser
 import logging
 from pathlib import Path
 import threading
@@ -131,3 +131,37 @@ class GitManager:
     
     def push_changes(self):
         self.repo.remote().push(refspec=('commission-branch-' + str(self.commission_number)))
+    
+
+
+    def get_global_config(self) -> dict:
+        config = {}
+
+        with GitConfigParser(os.path.expanduser('~/.gitconfig'), read_only=True) as cw:
+            config['user.name'] = cw.get_value('user', 'name', '')
+            config['user.email'] = cw.get_value('user', 'email', '')
+            config['core.autocrlf'] = cw.get_value('core', 'autocrlf', False)
+
+        return config
+    
+
+
+    def valid_global_config(self) -> bool:
+        config = self.get_global_config()
+        return (
+            config['user.name']
+            and config['user.email']
+        )
+
+
+
+    def set_global_config(self, config : dict) -> bool:
+        with GitConfigParser(os.path.expanduser('~/.gitconfig'), read_only=False) as cw:
+            try:
+                cw.set_value('user', 'name', config['user.name'])
+                cw.set_value('user', 'email', config['user.email'])
+                cw.set_value('core', 'autocrlf', config['core.autocrlf'])
+                return True
+            except KeyError:
+                self.logger.exception('Failed to save global Git configuration:')
+                return False

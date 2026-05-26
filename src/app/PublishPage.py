@@ -52,8 +52,6 @@ class PublishPage(IPage):
             self.publish_button.config(state='disabled')
             self.logger.info(f'Path {path} is NOT a local repository. Blocking publish until path points to local git repo.')
             self.set_message('Path does not point to valid local Git repository!', 'error')
-        # TODO app message to display that a local repo is being used instead of remote
-        # TODO maybe debounce so that the log isn't polluted with each change to the stringvar. currently its every single character change
 
 
 
@@ -88,8 +86,8 @@ class PublishPage(IPage):
             self.git_manager.push_changes()
             self.git_manager.checkout_default_branch()
             self.set_message('Published! Checkout the project again before making more changes.', 'success')
-        except Exception as e:
-            self.logger.error(f'Fatal Git error: {e}')
+        except Exception:
+            self.logger.exception(f'Fatal Git error:')
             self.set_message('FATAL: Git error. Contact programmer or Carter Dugan', 'error')
 
 
