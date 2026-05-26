@@ -20,7 +20,7 @@ class UpdatePage(IPage):
         self.action_text.grid(column=1, row=1)
         self.checkout_project_button = Button(self, text="Close and Update", command=self.update)
         self.checkout_project_button.grid(column=1, row=2, padx=IPage.GRID_PADDING, pady=IPage.GRID_PADDING)
-        self.publish_project_button = Button(self, text="Ignore", command=lambda: controller.show_frame(MainPage))
+        self.publish_project_button = Button(self, text="Ignore", command=controller.go_home)
         self.publish_project_button.grid(column=1, row=3, padx=IPage.GRID_PADDING, pady=IPage.GRID_PADDING)
         self.pad()
 

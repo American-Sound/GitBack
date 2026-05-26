@@ -49,8 +49,6 @@ class CheckoutPage(IPage):
         else:
             self.repo_entry.config(state='normal')
             self.logger.info(f'Path {path} is NOT a local repository. The remote URL will be used for checkout into the specified path.')
-        # TODO app message to display that a local repo is being used instead of remote
-        # TODO maybe debounce so that the log isn't polluted with each change to the stringvar. currently its every single character change
 
 
 
@@ -77,9 +75,10 @@ class CheckoutPage(IPage):
                     self.git_manager.clone_project(url, path)
             self.git_manager.checkout_commission_branch()
             self.set_message('Project successfully checked out!', 'success')
-        except Exception as e:
-            self.logger.error(f'Fatal Git error: {e}')
+        except Exception:
+            self.logger.exception(f'Fatal Git error:')
             self.set_message('FATAL: Git error. Contact programmer or Carter Dugan', 'error')
+
 
 
     def browse(self):
