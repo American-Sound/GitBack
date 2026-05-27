@@ -7,22 +7,22 @@ from core.GitManager import *
 
 
 class CheckoutPage(IPage):
-    
-    
-    
+
+
+
     def __init__(self, parent, controller, git_manager, logger):
-        
+
         super().__init__(parent, logger)
 
         self.git_manager = git_manager
-        
+
         self.repo_url_text = Label(self, text="Repo URL")
         self.repo_url_text.grid(column=0, row=1)
         self.repo_entry = Entry(self, width=IPage.TEXT_ENTRY_WIDTH)
         self.repo_entry.grid(column=1, row=1)
         self.repo_checkout_button = Button(self, text="Checkout", command=self.checkout)
         self.repo_checkout_button.grid(column=2, row=1)
-        
+
         self.path_text = Label(self, text="Path")
         self.path_text.grid(column=0, row=2)
         self.path_stringvar = StringVar()

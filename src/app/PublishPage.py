@@ -11,11 +11,11 @@ class PublishPage(IPage):
 
 
     def __init__(self, parent, controller, git_manager, logger):
-        
+
         super().__init__(parent, logger)
 
         self.git_manager = git_manager
-        
+
         self.path_url_text = Label(self, text="Path")
         self.path_url_text.grid(column=0, row=1)
         self.path_stringvar = StringVar()
@@ -25,7 +25,7 @@ class PublishPage(IPage):
         self.path_entry.grid(column=1, row=1)
         self.browse_button = Button(self, text="Browse 🗀", command=self.browse)
         self.browse_button.grid(column=2, row=1)
-        
+
         self.message_text = Label(self, text="Message")
         self.message_text.grid(column=0, row=2)
         self.message_entry = Entry(self, width=IPage.TEXT_ENTRY_WIDTH)
@@ -64,22 +64,22 @@ class PublishPage(IPage):
             self.logger.warning(f'Rejecting publish due to lack of commit message.')
             self.set_message(f'Cannot publish without a message!', 'warning')
             return
-        
+
         if not is_local_repository(path):
             self.logger.error(f'Failed. {path} is not a valid local repo.')
             self.set_message('Path does not point to valid local repo!', 'error')
             return
-        
+
         if not self.git_manager.is_dirty():
             self.logger.error(f'No changes to publish. Aborting.')
             self.set_message('This repository has no changes to publish.', 'warning')
             return
-        
+
         if not self.git_manager.commission_branch_checked_out():
             self.logger.error(f'Failed. There are changes, but not in a commission branch. Corrupt project state.')
             self.set_message('Repository corrupted. Reach out to programmer or Carter Dugan.', 'error')
             return
-        
+
         try:
             self.git_manager.add_changes()
             self.git_manager.commit_changes(message)
@@ -91,7 +91,7 @@ class PublishPage(IPage):
             self.set_message('FATAL: Git error. Contact programmer or Carter Dugan', 'error')
 
 
-    
+
     def browse(self):
         self.logger.info('Browsing local files for publish path.')
         folder_path = askdirectory()

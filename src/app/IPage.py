@@ -26,7 +26,7 @@ class IPage(Frame):
 
     ## misc
     LOGO_WIDTH: int  = 255
-    LOGO_HEIGHT: int = 66 
+    LOGO_HEIGHT: int = 66
 
 
 
@@ -49,7 +49,7 @@ class IPage(Frame):
 
         self.message = None
 
-    
+
 
     def add_info_message(self, p_column, p_row):
         self.message_stringvar = StringVar()
@@ -75,7 +75,7 @@ class IPage(Frame):
         thread.start()
 
 
-    
+
     def _set_temporary_message(self, message):
         if not self.message: return
 
