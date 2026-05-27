@@ -10,7 +10,7 @@ from core.Updater import *
 
 
 class App(Tk):
-    
+
 
 
     def __init__(self, git_manager, logger):
@@ -29,7 +29,7 @@ class App(Tk):
             frame = F(container, self, git_manager, logger)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky='nsew')
-        
+
         if self.frames[UpdatePage].updates_available():
             self.show_frame(UpdatePage)
         else:

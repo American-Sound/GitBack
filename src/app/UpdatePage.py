@@ -25,7 +25,7 @@ class UpdatePage(IPage):
         self.pad()
 
 
-    
+
     def updates_available(self):
         return self.available_updates != None
 
