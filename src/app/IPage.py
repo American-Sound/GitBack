@@ -18,11 +18,12 @@ class IPage(Frame):
     MAINFRAME_PADDING_X: int      = 12
     MAINFRAME_PADDING_Y: int      = 3
 
-    ## Text entry boxes
+    ## Box dimensions
     TEXT_ENTRY_WIDTH: int = 60
+    DROPDOWN_WIDTH:   int = 30
 
     ## user messages/warnings
-    WARNING_LIFETIME: int = 5
+    WARNING_LIFETIME: int = 10
 
     ## misc
     LOGO_WIDTH: int  = 255
@@ -48,6 +49,7 @@ class IPage(Frame):
         self.logger = logger
 
         self.message = None
+        self.home_button = None
 
 
 
@@ -56,37 +58,57 @@ class IPage(Frame):
         self.message = Label(self, textvariable=self.message_stringvar)
         self.message.grid(column=p_column, row=p_row, padx=IPage.GRID_PADDING, pady=IPage.GRID_PADDING)
         self.message_lock = threading.Lock()
+        self.message_id = 0
+
+
+
+    def add_home_button(self, p_column, p_row, controller):
+        self.home_button = Button(self, text="Home", command=lambda: controller.go_home())
+        self.home_button.grid(column=p_column, row=p_row)
 
 
 
     def set_message(self, message, severity='info'):
         if not self.message: return
 
-        if severity == 'info':
-            self.message.config(foreground='Black')
-        elif severity == 'warning':
-            self.message.config(foreground='#A0A000')
-        elif severity == 'error':
-            self.message.config(foreground='Red')
-        elif severity == 'success':
-            self.message.config(foreground='Green')
+        color_map = {'info': 'Black', 'warning': '#808000', 'error': 'Red', 'success': 'Green'}
+        color = color_map.get(severity, 'Black')
+        self.after(0, lambda: self.message.config(foreground=color))
 
-        thread = threading.Thread(target=self._set_temporary_message, args=(message,))
+        with self.message_lock:
+            self.message_id += 1
+            my_id = self.message_id
+
+        thread = threading.Thread(target=self._set_temporary_message, args=(message, my_id,), daemon=True)
         thread.start()
 
 
 
-    def _set_temporary_message(self, message):
-        if not self.message: return
+    def clear_message(self):
+        with self.message_lock:
+            self.message_id += 1
 
-        # try-catch here because if the user closes the window before the thread resumes,
-        # we get a runtime error. Should not add anything else to this try: block.
+
+
+    # This method is called by the App controller object after a page transition occurs.
+    # It can be overridden in child classes order to enforce checks, setup, etc..
+    def post_raise(self):
+        pass
+
+
+
+    def _set_temporary_message(self, message, my_id):
+        if not self.message: return
         try:
+            for i in range(self.WARNING_LIFETIME):
+                with self.message_lock:
+                    if self.message_id != my_id:
+                        return
+                self.after(0, lambda i=i: self.message_stringvar.set(message + f' ({self.WARNING_LIFETIME - i}s)'))
+                time.sleep(1)
             with self.message_lock:
-                for i in range(self.WARNING_LIFETIME):
-                    self.message_stringvar.set(message + f' ({self.WARNING_LIFETIME - i}s)')
-                    time.sleep(self.WARNING_LIFETIME / self.WARNING_LIFETIME)
-                self.message_stringvar.set('')
+                if self.message_id == my_id:
+                    self.after(0, lambda: self.message_stringvar.set(''))
         except RuntimeError:
             pass
 

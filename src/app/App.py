@@ -5,6 +5,7 @@ from .CheckoutPage import CheckoutPage
 from .PublishPage import PublishPage
 from .UpdatePage import UpdatePage
 from .SettingsPage import SettingsPage
+from .ManagePage import ManagePage
 from core.Updater import *
 
 
@@ -25,7 +26,7 @@ class App(Tk):
         self.frames = {}
         self.frames_stack = []
 
-        for F in (UpdatePage, MainPage, CheckoutPage, PublishPage, SettingsPage):
+        for F in (UpdatePage, MainPage, CheckoutPage, ManagePage, PublishPage, SettingsPage):
             frame = F(container, self, git_manager, logger)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky='nsew')
@@ -38,9 +39,9 @@ class App(Tk):
 
 
     def go_home(self):
+        # Enforce minimum required configuration
         if not self.git_manager.valid_global_config():
             self.show_frame(SettingsPage)
-            self.frames[SettingsPage].validate_credentials()
         else:
             self.show_frame(MainPage)
 
@@ -61,6 +62,7 @@ class App(Tk):
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
+        frame.post_raise()
         frame.update_idletasks()
         self.geometry(f"{frame.winfo_reqwidth()}x{frame.winfo_reqheight()}")
         self.frames_stack.append(frame)

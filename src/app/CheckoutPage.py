@@ -32,8 +32,7 @@ class CheckoutPage(IPage):
         self.browse_button = Button(self, text="Browse 🗀", command=self.browse)
         self.browse_button.grid(column=2, row=2)
 
-        self.back_button = Button(self, text="Back", command=lambda: controller.go_home())
-        self.back_button.grid(column=0, row=3, padx=IPage.GRID_PADDING, pady=IPage.GRID_PADDING)
+        self.add_home_button(0,3,controller)
 
         self.add_info_message(1,3)
         self.pad()
@@ -60,21 +59,24 @@ class CheckoutPage(IPage):
         try:
             if is_local_repository(path):
                 self.git_manager.checkout_local_repo(path)
-                if not self.git_manager.default_branch_checked_out():
-                    self.logger.error(f'Failed. Default branch must be checked out, and it is not.')
-                    self.set_message('Unpublished changes in this local repository!', 'error')
-                    return
-                else:
+
+                if self.git_manager.default_branch_checked_out():
                     self.git_manager.pull_updates()
+
             else:
-                if not is_remote_repository(url):
+                repo_name = is_remote_repository(url)
+                if not repo_name:
                     self.logger.error(f'Failed. {url} is not a valid remote repository.')
                     self.set_message('URL does not point to a valid remote repository!', 'error')
                     return
+
                 else:
-                    self.git_manager.clone_project(url, path)
-            self.git_manager.checkout_commission_branch()
+                    destination_path = Path(path) / repo_name
+                    destination_path.mkdir(parents=True, exist_ok=True)
+                    self.git_manager.clone_project(url, destination_path)
+
             self.set_message('Project successfully checked out!', 'success')
+
         except Exception:
             self.logger.exception(f'Fatal Git error:')
             self.set_message('FATAL: Git error. Contact programmer or Carter Dugan', 'error')
