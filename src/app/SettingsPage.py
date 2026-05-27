@@ -32,11 +32,14 @@ class SettingsPage(IPage):
         self.save_button = Button(self, text="Save Settings", command=self.save_settings)
         self.save_button.grid(column=1, row=4)
 
-        self.back_button = Button(self, text="Back", command=lambda: controller.go_home())
-        self.back_button.grid(column=0, row=4, padx=IPage.GRID_PADDING, pady=IPage.GRID_PADDING)
-
+        self.add_home_button(0, 4, controller)
         self.add_info_message(1,3)
         self.pad()
+
+
+
+    def post_raise(self):
+        self.validate_credentials()
 
 
 
@@ -62,7 +65,7 @@ class SettingsPage(IPage):
     def validate_credentials(self) -> bool:
         if not self.git_manager.valid_global_config():
             self.set_message('Please set your credentials!', 'warning')
-            self.back_button.config(state='disabled')
+            self.home_button.config(state='disabled')
         else:
-            self.back_button.config(state='normal')
+            self.home_button.config(state='normal')
 

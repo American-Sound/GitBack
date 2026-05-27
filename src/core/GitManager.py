@@ -15,12 +15,12 @@ def is_local_repository(path):
 
 
 
-def is_remote_repository(url):
+def is_remote_repository(url) -> str:
     try:
-        Git().execute(['git', 'ls-remote', url])
-        return True
+        git_url = Git().execute(['git', 'ls-remote', '--get-url', url])
+        return git_url.split('/')[-1].replace('.git', '')
     except GitCommandError:
-        return False
+        return None
 
 
 
@@ -68,8 +68,14 @@ class GitManager:
         self.config = git.GitConfigParser()
         _setup_git_environment(logger)
         self.repo = None
-        self.commission_number = 0
+        self.repo_name = ""
         self.lock = threading.Lock()
+
+
+
+
+    def is_project_checked_out(self) -> bool:
+        return self.repo is not None
 
 
 
@@ -83,6 +89,10 @@ class GitManager:
 
 
 
+    def get_commission_branches(self) -> list:
+        return [head.name for head in self.repo.heads if head.name.startswith('commission-branch')]
+
+
     def commission_branch_checked_out(self):
         return self.repo.active_branch.name.startswith('commission-branch-')
 
@@ -93,10 +103,14 @@ class GitManager:
 
 
 
-    def checkout_commission_branch(self):
-        while 'origin/commission-branch-' + str(self.commission_number) in [ref.name for ref in self.repo.remote().refs]:
-            self.commission_number += 1
-        self.repo.create_head('commission-branch-' + str(self.commission_number)).checkout()
+    def checkout_new_branch(self, branch):
+        self.repo.create_head(branch).checkout()
+
+
+
+
+    def checkout_branch(self, branch):
+        self.repo.heads[branch].checkout()
 
 
 
@@ -110,11 +124,13 @@ class GitManager:
 
     def checkout_local_repo(self, path):
         self.repo = git.Repo(path)
+        self.repo_name = os.path.basename(self.repo.working_tree_dir)
 
 
 
     def clone_project(self, url, path):
         self.repo = git.Repo.clone_from(url, path)
+        self.repo_name = os.path.basename(self.repo.working_tree_dir)
         self.logger.info(f'Successfully cloned {url} to {path}')
 
 
@@ -130,7 +146,7 @@ class GitManager:
 
 
     def push_changes(self):
-        self.repo.remote().push(refspec=('commission-branch-' + str(self.commission_number)))
+        self.repo.remote().push(self.repo.active_branch.name)
 
 
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 from pathlib import Path
-from platformdirs import user_data_dir
+from platformdirs import user_log_dir
 from .GitManager import GitManager
 from .Updater import __version__
 
@@ -10,7 +10,7 @@ def setup_logging() -> logging.Logger:
     logger = logging.getLogger("CartoisGit")
     logger.setLevel(logging.DEBUG)
 
-    log_dir = Path(user_data_dir("GitBack")) / "logs"
+    log_dir = Path(user_log_dir("GitBack")) / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     filename = log_dir / (datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".log")
     handler = logging.FileHandler(filename, encoding="utf-8")
