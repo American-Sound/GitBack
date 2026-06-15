@@ -2,7 +2,6 @@ from tkinter import *
 from tkinter import ttk
 from .MainPage import MainPage
 from .CheckoutPage import CheckoutPage
-from .PublishPage import PublishPage
 from .UpdatePage import UpdatePage
 from .SettingsPage import SettingsPage
 from .ManagePage import ManagePage
@@ -26,7 +25,7 @@ class App(Tk):
         self.frames = {}
         self.frames_stack = []
 
-        for F in (UpdatePage, MainPage, CheckoutPage, ManagePage, PublishPage, SettingsPage):
+        for F in (UpdatePage, MainPage, CheckoutPage, ManagePage, SettingsPage):
             frame = F(container, self, git_manager, logger)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky='nsew')
