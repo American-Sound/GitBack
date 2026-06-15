@@ -2,7 +2,6 @@ from tkinter import *
 from tkinter import ttk
 from .IPage import IPage
 from .CheckoutPage import CheckoutPage
-from .PublishPage import PublishPage
 from .SettingsPage import SettingsPage
 from .ManagePage import ManagePage
 from core.GitManager import *
