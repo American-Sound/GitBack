@@ -150,6 +150,16 @@ class GitManager:
 
 
 
+    def stash(self):
+        self.repo.git.stash()
+
+
+
+    def stash_pop(self):
+        self.repo.git.stash("pop")
+
+
+
     def get_global_config(self) -> dict:
         config = {}
 
