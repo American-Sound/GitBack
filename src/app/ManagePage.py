@@ -103,8 +103,7 @@ class ManagePage(IPage):
             return
 
         if not self.git_manager.commission_branch_checked_out():
-            self.logger.error(f'Failed. There are changes, but not in a commission branch. Corrupt project state.')
-            self.set_message('Repository corrupted. Reach out to programmer or Carter Dugan.', 'error')
+            self.set_message('Check out a work branch before you save a snapshot!', 'error')
             return
 
         self.git_manager.add_changes()
@@ -129,17 +128,24 @@ class ManagePage(IPage):
 
     def change_branch(self, *args):
         branch = self.branch_dropdown.get()
+        stashed = False
         self.logger.info(f'Attempting to checkout branch {branch} from dropdown...')
         if self.git_manager.is_dirty():
-            self.logger.error(f'Failed to checkout existing branch {branch} due to existing changes without a snapshot.')
-            self.set_message('Branch has unsaved changes! Aborting.', 'error')
-            return
+            try:
+                self.git_manager.stash()
+                stashed = True
+            except:
+                self.logger.error(f'Failed to checkout existing branch {branch} due to existing changes without a snapshot.')
+                self.set_message('Branch has unsaved changes! Aborting.', 'error')
+                return
         try:
             self.git_manager.checkout_default_branch()
             self.git_manager.pull_updates()
             self.git_manager.checkout_branch(branch)
             self.post_raise()
             self.set_message(f'Switched to {branch}')
+            if stashed:
+                self.git_manager.stash_pop()
         except:
             self.logger.exception(f'Fatal Git error:')
             self.set_message('FATAL: Git error. Contact programmer or Carter Dugan', 'error')
@@ -148,15 +154,20 @@ class ManagePage(IPage):
 
     def new_branch(self, *args):
         branch = 'commission-branch-' + self.new_branch_stringvar.get()
+        stashed = False
         if re.search(r'[^a-zA-Z0-9._\-/]', branch):
             self.logger.error(f'Failed to checkout new commission branch due to invalid characters "{branch}"')
             self.set_message('Invalid characters. Can only use numbers, letters, and ._-/')
             return
 
         if self.git_manager.is_dirty():
-            self.logger.error(f'Failed to checkout new branch {branch} due to existing changes without a snapshot.')
-            self.set_message('Branch has unsaved changes! Aborting.', 'error')
-            return
+            try:
+                self.git_manager.stash()
+                stashed = True
+            except:
+                self.logger.error(f'Failed to checkout new branch {branch} due to existing changes without a snapshot.')
+                self.set_message('Branch has unsaved changes! Aborting.', 'error')
+                return
 
         try:
             self.git_manager.checkout_default_branch()
@@ -164,6 +175,8 @@ class ManagePage(IPage):
             self.git_manager.checkout_new_branch(branch)
             self.post_raise()
             self.set_message(f'Switched to {branch}')
+            if stashed:
+                self.git_manager.stash_pop()
         except:
             self.logger.exception(f'Fatal Git error:')
             self.set_message('FATAL: Git error. Contact programmer or Carter Dugan', 'error')
