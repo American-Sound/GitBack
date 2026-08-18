@@ -20,7 +20,7 @@ The typical usage of GitBack is as follows:
 4. The user begins working, taking snapshots of their progress as they make progress.
 5. When the user is finished working, they publish the changes they have made.
 
-![](./usage.png)
+![alt text](img/usage.png)
 
 When you first install and launch GitBack, you will be taken to the [settings screen](./settings.md). Be sure to enter all required details and save in order to use the app.
 
