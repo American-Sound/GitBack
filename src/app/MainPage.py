@@ -5,6 +5,7 @@ from .CheckoutPage import CheckoutPage
 from .SettingsPage import SettingsPage
 from .ManagePage import ManagePage
 from core.GitManager import *
+import webbrowser
 
 
 
@@ -25,6 +26,8 @@ class MainPage(IPage):
         self.manage_project_button.grid(column=1, row=4)
         self.settings_button = Button(self, text="Settings", command=lambda: controller.show_frame(SettingsPage))
         self.settings_button.grid(column=1, row=5)
+        self.help_button = Button(self, text="Help", command=lambda: webbrowser.open('https://github.com/American-Sound/GitBack/blob/main/doc/README.md'))
+        self.help_button.grid(column=1, row=6)
         self.pad()
 
 
