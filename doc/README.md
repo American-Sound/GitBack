@@ -10,6 +10,10 @@ GitBack is a tool designed for employees at American Sound who may need to use G
 
 You must have Git installed in order to use GitBack.
 
+## Installation
+
+You can install the latest version of GitBack by downloading the setup installer **(`GitBack_Setup_<version>.exe`)** from [here](https://github.com/American-Sound/GitBack/releases/latest) and then running the executable.
+
 ## Usage
 
 The typical usage of GitBack is as follows:
